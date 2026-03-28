@@ -1,0 +1,7 @@
+{
+  "name": "daily-expense-tracker",
+  "integrations": {
+    "capacitor": {}
+  },
+  "type": "react-vite"
+}
