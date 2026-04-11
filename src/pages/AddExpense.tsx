@@ -1,3 +1,4 @@
+
 import React, { useState } from 'react';
 import {
   IonPage,
@@ -80,7 +81,7 @@ const AddExpense: React.FC = () => {
   return (
     <IonPage>
       <IonHeader>
-        <IonToolbar color="tertiary">
+        <IonToolbar color="primary">
           <IonTitle>Add Expense</IonTitle>
         </IonToolbar>
       </IonHeader>
