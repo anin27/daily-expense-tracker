@@ -25,36 +25,72 @@ interface BudgetContextType {
 // Create the context
 const BudgetContext = createContext<BudgetContextType | undefined>(undefined);
 
-// Provider component
+// ✅ HELPER FUNCTION: Get current month as "YYYY-MM" (defined OUTSIDE component)
+const getCurrentMonth = (): string => {
+  const now = new Date();
+  const year = now.getFullYear();
+  const month = String(now.getMonth() + 1).padStart(2, '0');
+  return `${year}-${month}`;
+};
+
+// ✅ PROVIDER COMPONENT: All hooks MUST be inside this function
 export const BudgetProvider: React.FC<{ children: ReactNode }> = ({ children }) => {
+  
+  // State: Monthly budget
   const [monthlyBudget, setMonthlyBudget] = useState<number>(() => {
     const saved = localStorage.getItem('monthlyBudget');
     return saved ? parseFloat(saved) : 500;
   });
 
+  // State: Expenses list
   const [expenses, setExpenses] = useState<Expense[]>(() => {
     const saved = localStorage.getItem('expenses');
     return saved ? JSON.parse(saved) : [];
   });
 
+  // State: Currency
   const [currency, setCurrency] = useState<string>(() => {
     return localStorage.getItem('currency') || 'EUR';
   });
 
-  // Save to localStorage when values change
+  // ✅ State: Track last reset month (NEW for monthly reset)
+  const [lastResetMonth, setLastResetMonth] = useState<string>(() => {
+    const saved = localStorage.getItem('budgetMonth');
+    return saved || getCurrentMonth();
+  });
+
+  // Save budget to localStorage
   useEffect(() => {
     localStorage.setItem('monthlyBudget', monthlyBudget.toString());
   }, [monthlyBudget]);
 
+  // Save expenses to localStorage
   useEffect(() => {
     localStorage.setItem('expenses', JSON.stringify(expenses));
   }, [expenses]);
 
+  // Save currency to localStorage
   useEffect(() => {
     localStorage.setItem('currency', currency);
   }, [currency]);
 
-  // Calculate totals
+  // Save last reset month to localStorage
+  useEffect(() => {
+    localStorage.setItem('budgetMonth', lastResetMonth);
+  }, [lastResetMonth]);
+
+  // ✅ NEW: Check if month changed → reset expenses automatically
+  useEffect(() => {
+    const currentMonth = getCurrentMonth();
+    
+    if (lastResetMonth !== currentMonth) {
+      // New month detected! Clear all expenses
+      setExpenses([]);
+      setLastResetMonth(currentMonth);
+    }
+  }, [lastResetMonth]); // Only re-run when lastResetMonth changes
+
+  // Calculate totals (pure functions - no hooks here)
   const totalSpent = expenses.reduce((sum, exp) => sum + exp.amount, 0);
   const remaining = monthlyBudget - totalSpent;
 
@@ -80,6 +116,7 @@ export const BudgetProvider: React.FC<{ children: ReactNode }> = ({ children }) 
     }, {} as Record<string, number>);
   };
 
+  // Return the provider with all values
   return (
     <BudgetContext.Provider value={{
       monthlyBudget,
@@ -97,9 +134,7 @@ export const BudgetProvider: React.FC<{ children: ReactNode }> = ({ children }) 
   );
 };
 
-// ============================================
-// IMPORTANT: This is the custom hook that Home.tsx uses
-// ============================================
+// ✅ Custom hook to use the context (defined OUTSIDE component)
 export const useBudget = () => {
   const context = useContext(BudgetContext);
   if (!context) {

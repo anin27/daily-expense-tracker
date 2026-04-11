@@ -5,16 +5,19 @@ import {
   IonToolbar,
   IonTitle,
   IonContent,
-  IonList,
-  IonItem,
+  IonCard,
+  IonCardContent,
   IonLabel,
   IonInput,
   IonButton,
   IonToggle,
-  IonAlert,
   IonSelect,
   IonSelectOption,
   IonIcon,
+  IonGrid,
+  IonRow,
+  IonCol,
+  IonItem, 
 } from '@ionic/react';
 import { useBudget } from '../context/BudgetContext';
 import { 
@@ -22,7 +25,6 @@ import {
   notifications, 
   moon, 
   language,
-  save,
 } from 'ionicons/icons';
 
 const Settings: React.FC = () => {
@@ -36,8 +38,6 @@ const Settings: React.FC = () => {
 
   // Local state
   const [budgetInput, setBudgetInput] = useState(monthlyBudget.toString());
-  const [showAlert, setShowAlert] = useState(false);
-  const [alertMessage, setAlertMessage] = useState('');
   const [notificationsEnabled, setNotificationsEnabled] = useState(true);
   const [darkMode, setDarkMode] = useState(false);
 
@@ -46,37 +46,25 @@ const Settings: React.FC = () => {
     const newBudget = parseFloat(budgetInput);
     
     if (isNaN(newBudget) || newBudget <= 0) {
-      setAlertMessage('Please enter a valid budget amount greater than 0');
-      setShowAlert(true);
+      alert('Please enter a valid budget amount greater than 0');
       return;
     }
 
     updateBudget(newBudget);
-    setAlertMessage(`Monthly budget updated to €${newBudget.toFixed(2)}!`);
-    setShowAlert(true);
   };
 
   // Handle currency change
   const handleCurrencyChange = (event: CustomEvent) => {
     const newCurrency = event.detail.value;
     setCurrency(newCurrency);
-    setAlertMessage(`Currency changed to ${newCurrency}`);
-    setShowAlert(true);
   };
 
   // Handle notifications toggle
   const handleNotificationsToggle = (event: CustomEvent) => {
     setNotificationsEnabled(event.detail.checked);
-    setAlertMessage(
-      event.detail.checked 
-        ? 'Notifications enabled' 
-        : 'Notifications disabled'
-    );
-    setShowAlert(true);
   };
 
   // Handle dark mode toggle
-
   const handleDarkModeToggle = (event: CustomEvent) => {
     setDarkMode(event.detail.checked);
     
@@ -86,13 +74,6 @@ const Settings: React.FC = () => {
     } else {
       document.body.classList.remove('dark-mode');
     }
-    
-    setAlertMessage(
-      event.detail.checked 
-        ? 'Dark mode enabled' 
-        : 'Light mode enabled'
-    );
-    setShowAlert(true);
   };
 
   // Get currency symbol
@@ -108,159 +89,143 @@ const Settings: React.FC = () => {
   return (
     <IonPage>
       <IonHeader>
-        <IonToolbar color="medium">
+        <IonToolbar color="tertiary">
           <IonTitle>Settings</IonTitle>
         </IonToolbar>
       </IonHeader>
       <IonContent className="ion-padding">
         
-        {/* Budget Settings */}
-        <IonList>
-          <IonItem>
-            <IonIcon icon={cash} slot="start" style={{ marginRight: '10px' }} />
-            <IonLabel>
-              <h2>Monthly Budget</h2>
-              <p style={{ fontSize: '14px', color: '#666' }}>
-                Set your monthly spending limit
-              </p>
-            </IonLabel>
-          </IonItem>
-          
-          <IonItem>
-            <IonLabel position="stacked">Current Budget</IonLabel>
-            <IonInput
-              type="number"
-              step="0.01"
-              min="0"
-              value={budgetInput}
-              onIonInput={(e: CustomEvent) => setBudgetInput(e.detail.value)}
-              placeholder="Enter amount"
-              style={{ '--padding-top': '10px' }}
-            />
-          </IonItem>
-          
-          <IonItem>
-            <IonButton 
-              expand="block" 
-              onClick={handleUpdateBudget}
-              color="primary"
-            >
-              <IonIcon icon={save} slot="start" style={{ marginRight: '5px' }} />
-              Update Budget
-            </IonButton>
-          </IonItem>
-        </IonList>
+        {/*  BUDGET SETTINGS  */}
+        <IonCard>
+          <IonCardContent>
+            <div style={{ display: 'flex', alignItems: 'center', marginBottom: '20px' }}>
+              <IonIcon icon={cash} slot="start" style={{ marginRight: '12px', fontSize: '24px', color: '#27ae60' }} />
+              <h2 style={{ margin: 0, fontSize: '20px', fontWeight: '600', color: '#333' }}>Monthly Budget</h2>
+            </div>
+            
+            <p style={{ fontSize: '16px', color: '#666', marginBottom: '20px', lineHeight: '1.5' }}>
+              Set your monthly spending limit
+            </p>
+            
+            {/* Input and Button on Same Row */}
+            <IonGrid>
+              <IonRow className="ion-align-items-end">
+                <IonCol size="8">
+                  <IonLabel position="stacked" style={{ fontSize: '14px', color: '#555', marginBottom: '8px', fontWeight: '500' }}>
+                    Budget Amount ({getCurrencySymbol(currency)})
+                  </IonLabel>
+                  <IonInput
+                    type="number"
+                    step="0.01"
+                    min="0"
+                    value={budgetInput}
+                    onIonInput={(e: CustomEvent) => setBudgetInput(e.detail.value)}
+                    placeholder="Enter amount"
+                    style={{ 
+                      '--background': '#f8f9fa',
+                      '--border-radius': '8px',
+                      '--padding-top': '12px',
+                      '--padding-bottom': '12px',
+                      '--padding-start': '14px',
+                      fontSize: '16px',
+                    }}
+                  />
+                </IonCol>
+                <IonCol size="4">
+                  <IonButton 
+                    size="small"
+                    onClick={handleUpdateBudget}
+                    color="primary"
+                    style={{ 
+                      '--border-radius': '8px',
+                      height: '42px',
+                      fontSize: '15px',
+                      fontWeight: '600',
+                    }}
+                  >
+                    Update
+                  </IonButton>
+                </IonCol>
+              </IonRow>
+            </IonGrid>
+            
+            <p style={{ fontSize: '14px', color: '#888', marginTop: '12px' }}>
+              Current: <strong style={{ color: '#27ae60', fontSize: '16px' }}>{getCurrencySymbol(currency)}{monthlyBudget.toFixed(2)}</strong>
+            </p>
+          </IonCardContent>
+        </IonCard>
 
-        {/* Currency Settings */}
-        <IonList>
-          <IonItem>
-            <IonIcon icon={language} slot="start" style={{ marginRight: '10px' }} />
-            <IonLabel>
-              <h2>Currency</h2>
-              <p style={{ fontSize: '14px', color: '#666' }}>
-                Choose your preferred currency
-              </p>
-            </IonLabel>
-          </IonItem>
-          
-          <IonItem>
-            <IonLabel>Display Currency</IonLabel>
-            <IonSelect
-              value={currency}
-              onIonChange={handleCurrencyChange}
-              interface="popover"
-              style={{ maxWidth: '150px' }}
-            >
-              <IonSelectOption value="EUR">EUR (€)</IonSelectOption>
-              <IonSelectOption value="USD">USD ($)</IonSelectOption>
-              <IonSelectOption value="GBP">GBP (£)</IonSelectOption>
-            </IonSelect>
-          </IonItem>
-          
-          <IonItem>
-            <IonLabel style={{ fontSize: '12px', color: '#999' }}>
-              Current: {getCurrencySymbol(currency)} {currency}
-            </IonLabel>
-          </IonItem>
-        </IonList>
+        {/* CURRENCY SETTINGS */}
+        <IonCard>
+          <IonCardContent>
+            <div style={{ display: 'flex', alignItems: 'center', marginBottom: '16px' }}>
+              <IonIcon icon={language} slot="start" style={{ marginRight: '12px', fontSize: '24px', color: '#3498db' }} />
+              <h2 style={{ margin: 0, fontSize: '20px', fontWeight: '600', color: '#333' }}>Currency</h2>
+            </div>
+            
+            <IonItem lines="none" style={{ '--background': 'transparent', '--padding-start': '0', '--padding-end': '0' }}>
+              <IonLabel style={{ fontSize: '16px', color: '#555', fontWeight: '500' }}>Display Currency</IonLabel>
+              <IonSelect
+                value={currency}
+                onIonChange={handleCurrencyChange}
+                interface="popover"
+                style={{ maxWidth: '140px', textAlign: 'right', fontSize: '16px' }}
+              >
+                <IonSelectOption value="EUR">EUR (€)</IonSelectOption>
+                <IonSelectOption value="USD">USD ($)</IonSelectOption>
+                <IonSelectOption value="GBP">GBP (£)</IonSelectOption>
+              </IonSelect>
+            </IonItem>
+          </IonCardContent>
+        </IonCard>
 
-        {/* Notification Settings */}
-        <IonList>
-          <IonItem>
-            <IonIcon icon={notifications} slot="start" style={{ marginRight: '10px' }} />
-            <IonLabel>
-              <h2>Notifications</h2>
-              <p style={{ fontSize: '14px', color: '#666' }}>
-                Enable or disable budget alerts
-              </p>
-            </IonLabel>
-            <IonToggle
-              checked={notificationsEnabled}
-              onIonChange={handleNotificationsToggle}
-              slot="end"
-            />
-          </IonItem>
-          
-          <IonItem>
-            <IonLabel style={{ fontSize: '13px', color: '#666' }}>
-              Get notified when you're close to your budget limit
-            </IonLabel>
-          </IonItem>
-        </IonList>
+        {/*  NOTIFICATION SETTINGS  */}
+        <IonCard>
+          <IonCardContent>
+            <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
+              <div style={{ display: 'flex', alignItems: 'center', flex: 1 }}>
+                <IonIcon icon={notifications} slot="start" style={{ marginRight: '12px', fontSize: '24px', color: '#f39c12' }} />
+                <div>
+                  <h2 style={{ margin: 0, fontSize: '20px', fontWeight: '600', color: '#333' }}>Notifications</h2>
+                  <p style={{ margin: '5px 0 0 0', fontSize: '15px', color: '#666' }}>
+                    Budget alerts
+                  </p>
+                </div>
+              </div>
+              <IonToggle
+                checked={notificationsEnabled}
+                onIonChange={handleNotificationsToggle}
+                style={{ marginLeft: '15px', transform: 'scale(1.1)' }}
+              />
+            </div>
+          </IonCardContent>
+        </IonCard>
 
-        {/* Appearance Settings */}
-        <IonList>
-          <IonItem>
-            <IonIcon icon={moon} slot="start" style={{ marginRight: '10px' }} />
-            <IonLabel>
-              <h2>Appearance</h2>
-              <p style={{ fontSize: '14px', color: '#666' }}>
-                Toggle dark mode
-              </p>
-            </IonLabel>
-            <IonToggle
-              checked={darkMode}
-              onIonChange={handleDarkModeToggle}
-              slot="end"
-            />
-          </IonItem>
-          
-          <IonItem>
-            <IonLabel style={{ fontSize: '13px', color: '#666' }}>
-              Switch between light and dark theme
-            </IonLabel>
-          </IonItem>
-        </IonList>
+        {/*  APPEARANCE SETTINGS  */}
+        <IonCard>
+          <IonCardContent>
+            <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
+              <div style={{ display: 'flex', alignItems: 'center', flex: 1 }}>
+                <IonIcon icon={moon} slot="start" style={{ marginRight: '12px', fontSize: '24px', color: '#9b59b6' }} />
+                <div>
+                  <h2 style={{ margin: 0, fontSize: '20px', fontWeight: '600', color: '#333' }}>Dark Mode</h2>
+                  <p style={{ margin: '5px 0 0 0', fontSize: '15px', color: '#666' }}>
+                    Toggle theme
+                  </p>
+                </div>
+              </div>
+              <IonToggle
+                checked={darkMode}
+                onIonChange={handleDarkModeToggle}
+                style={{ marginLeft: '15px', transform: 'scale(1.1)' }}
+              />
+            </div>
+          </IonCardContent>
+        </IonCard>
 
-        {/* App Info */}
-        <div style={{ 
-          textAlign: 'center', 
-          padding: '40px 20px',
-          color: '#999'
-        }}>
-          <h3 style={{ margin: '0 0 10px 0', fontSize: '16px' }}>
-            Smart Budget App
-          </h3>
-          <p style={{ margin: '0', fontSize: '14px' }}>
-            Version 1.0.0
-          </p>
-          <p style={{ margin: '10px 0 0 0', fontSize: '12px' }}>
-            Built with Ionic React
-          </p>
-        </div>
-
-        {/* Alert for feedback */}
-        <IonAlert
-          isOpen={showAlert}
-          onDidDismiss={() => setShowAlert(false)}
-          header="Settings Updated"
-          message={alertMessage}
-          buttons={['OK']}
-        />
       </IonContent>
     </IonPage>
   );
 };
 
-// IMPORTANT: Default export for the component
 export default Settings;

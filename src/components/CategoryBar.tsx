@@ -10,6 +10,7 @@ interface CategoryBarProps {
   color?: string;
 }
 
+
 const CategoryBar: React.FC<CategoryBarProps> = ({
   category,
   amount,

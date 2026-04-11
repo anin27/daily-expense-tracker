@@ -14,8 +14,8 @@ import { home, add, time, settings } from 'ionicons/icons';
 
 // Import the NEW pages (not Tab1, Tab2, Tab3)
 import Home from './pages/Home';
-// import AddExpense from './pages/AddExpense';
-// import History from './pages/History';
+import AddExpense from './pages/AddExpense';
+import History from './pages/History';
 import Settings from './pages/Settings';
 
 // Import Context Provider for state management

@@ -37,31 +37,29 @@ const Home: React.FC = () => {
 
   return (
     <IonPage>
-      {/* ===== HEADER SECTION ===== */}
+      {/*  HEADER SECTION  */}
       <IonHeader>
-        <IonToolbar color="success">
+        <IonToolbar color="tertiary">
           <IonTitle>Dashboard</IonTitle>
         </IonToolbar>
       </IonHeader>
 
-      {/* ===== MAIN CONTENT SECTION ===== */}
+      {/*  MAIN CONTENT SECTION  */}
       <IonContent className="ion-padding">
         
-        {/* ----- CARD 1: Budget Overview ----- */}
+        {/*  CARD 1: Budget Overview */}
         <IonCard>
           <IonCardContent>
             <div style={{ textAlign: "center", marginBottom: "20px" }}>
-              {/* Label: "Monthly Budget" */}
               <h2 style={{ margin: "0", color: "#666", fontSize: "14px" }}>
                 Monthly Budget
               </h2>
               
-              {/* Big green number showing budget amount */}
               <h1
                 style={{
                   margin: "10px 0",
                   color: "#27ae60",
-                  fontSize: "36px",
+                  fontSize: "40px",
                 }}
               >
                 €{monthlyBudget.toFixed(2)}
@@ -86,7 +84,7 @@ const Home: React.FC = () => {
           </IonCardContent>
         </IonCard>
 
-        {/* ----- CARD 2: Spending by Category ----- */}
+        {/*  CARD 2: Spending by Category  */}
         <IonCard>
           <IonCardContent>
             <h3
@@ -113,7 +111,6 @@ const Home: React.FC = () => {
               {/* Empty state - shown when no expenses exist */}
               {Object.keys(expensesByCategory).length === 0 && (
                 <IonItem>
-                  {/* ✅ Fixed: Use archiveOutline icon (not 'inbox') */}
                   <IonIcon
                     icon={archiveOutline}
                     slot="start"
@@ -132,7 +129,7 @@ const Home: React.FC = () => {
           </IonCardContent>
         </IonCard>
 
-        {/* ----- FLOATING ACTION BUTTON: Add Expense ----- */}
+        {/*  Add Expense  */}
         <IonFab vertical="bottom" horizontal="end" slot="fixed">
           <IonFabButton
             color="primary"
